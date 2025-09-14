@@ -13,4 +13,12 @@ WEB-INF/web.xml           # Deployment descriptor
 # JAR projects have:
 src/main/resources/       # Embedded approach
 
+[Your Docker Build] → [Docker Layer Cache] → [Final Production Image]
+        │                     │                       │
+        ├─ /usr/src/mymaven/  →  Stored in cache     →  ❌ Not included
+        │   ├── src/          →  (invisible but      →  ❌
+        │   ├── pom.xml       →   still exists)      →  ❌  
+        │   └── target/       →                      →  ❌
+        │       └── java-tomcat-maven-example.war →   →  ✅ Only this copied
+        └─────────────────────────────────────────────→ Clean, small image
 
