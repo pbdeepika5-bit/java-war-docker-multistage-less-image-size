@@ -1,4 +1,4 @@
- by looking project file 
+  by looking project file 
 <!-- Look for these keywords: -->
 <packaging>war</packaging>                 → WAR approach
 <packaging>jar</packaging>                 → JAR approach
@@ -20,5 +20,51 @@ src/main/resources/       # Embedded approach
         │   ├── pom.xml       →   still exists)      →  ❌  
         │   └── target/       →                      →  ❌
         │       └── java-tomcat-maven-example.war →   →  ✅ Only this copied
-        └─────────────────────────────────────────────→ Clean, small image
+        └─────────────────────────────────────────────→ Clean, small image 
+🐳 Docker Multi-Stage Build Flow:
+STAGE 1: Maven Build Stage (FROM maven as maven)
+text
+/usr/src/mymaven/                   ← Created here in Stage 1
+├── src/                            ✅ Your source code
+├── pom.xml                         ✅ Maven configuration  
+└── target/                         ✅ Build artifacts folder
+    └── java-tomcat-maven-example.war ✅ Compiled WAR file
+DOCKER LAYER CACHE (Intermediate Storage)
+text
+📦 Layer Cache Stores:
+   - /usr/src/mymaven/src/          🗄️ Cached but hidden
+   - /usr/src/mymaven/pom.xml       🗄️ Cached but hidden
+   - /usr/src/mymaven/target/       🗄️ Cached but hidden
+STAGE 2: Tomcat Runtime Stage (FROM tomcat)
+text
+/usr/local/tomcat/                  ← Fresh Tomcat installation
+└── webapps/
+    └── ROOT.war                    ✅ ONLY the WAR file copied!
+    
+❌ NO /usr/src/mymaven/ directory
+❌ NO src/ folder  
+❌ NO pom.xml file
+❌ NO target/ folder
+🔁 Copy Operation:
+dockerfile
+# This line copies ONLY the WAR file:
+COPY --from=maven /usr/src/mymaven/target/java-tomcat-maven-example.war .
+
+# It does NOT copy:
+# ❌ /usr/src/mymaven/src/
+# ❌ /usr/src/mymaven/pom.xml  
+# ❌ /usr/src/mymaven/target/ (the folder itself)
+# ❌ Any other files in that directory
+🎯 Visual Summary:
+text
+STAGE 1 (Build)         →    DOCKER CACHE    →    STAGE 2 (Runtime)
+=================           ==============        ==================
+/usr/src/mymaven/           [Hidden Layers]       /usr/local/tomcat/
+├── src/                    - src/                └── webapps/
+├── pom.xml                 - pom.xml                └── ROOT.war ✅
+└── target/                 - target/            ❌ No other files!
+    └── example.war ✅       - example.war
+So Stage 1 has everything, but Stage 2 only gets the final WAR file! 🎉
+
+
 
