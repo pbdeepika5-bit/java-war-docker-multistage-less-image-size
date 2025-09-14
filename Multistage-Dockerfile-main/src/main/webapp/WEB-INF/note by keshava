@@ -1,0 +1,16 @@
+ by looking project file 
+<!-- Look for these keywords: -->
+<packaging>war</packaging>                 → WAR approach
+<packaging>jar</packaging>                 → JAR approach
+<artifactId>spring-boot</artifactId>       → Definitely JAR
+<artifactId>webapp-runner</artifactId>     → WAR with embedded
+<artifactId>tomcat</artifactId>            → WAR deployment
+
+# WAR projects have:
+src/main/webapp/           # Web resources
+WEB-INF/web.xml           # Deployment descriptor
+
+# JAR projects have:
+src/main/resources/       # Embedded approach
+
+
