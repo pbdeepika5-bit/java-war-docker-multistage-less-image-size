@@ -1,0 +1,1 @@
+# java-war-docker-multistage-less-image-size
